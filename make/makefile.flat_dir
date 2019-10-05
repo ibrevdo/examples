@@ -1,0 +1,31 @@
+
+TARGET	= example.exe
+
+CC	= gcc
+CFLAGS	= -Wall -g -fPIC
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
+
+SOURCES := $(wildcard *.c)
+OBJDIR 	:= obj
+DEPDIR	:= .dep
+OBJECTS := $(patsubst %.c,$(OBJDIR)/%.o,$(SOURCES))
+DEPS 	:= $(patsubst %.c,$(DEPDIR)/%.d,$(SOURCES))
+
+$(TARGET): $(OBJECTS)
+	$(CC) -o $@ $^ 
+
+$(OBJDIR)/%.o: %.c | $(OBJDIR) $(DEPDIR)
+	$(CC) $(DEPFLAGS) $(CFLAGS) -c -o $@ $<
+
+$(OBJDIR) $(DEPDIR):
+	mkdir -p $@
+
+.PHONY:	clean
+
+clean : 
+	rm -fr $(TARGET) $(OBJECTS) $(DEPS)
+
+include $(wildcard $(DEPS))
+
+$(DEPS):
+

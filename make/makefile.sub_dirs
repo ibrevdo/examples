@@ -1,0 +1,38 @@
+
+TARGET	= example.exe
+SRC 	= b b/c
+
+CC	= gcc
+CFLAGS	= -Wall -g -fPIC 
+CFLAGS	+= $(addprefix -I ,$(SRC))
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
+
+OBJDIR 		:= obj
+DEPDIR		:= .dep
+#SOURCES 	:= $(wildcard *.c **/*.c)
+SOURCES		:= $(shell find . -name "*.c")
+OBJECTS 	:= $(patsubst %.c,$(OBJDIR)/%.o,$(notdir $(SOURCES)))
+DEPS 		:= $(patsubst %.c,$(DEPDIR)/%.d,$(notdir $(SOURCES)))
+
+vpath %.c %.h $(SRC)
+
+$(TARGET): $(OBJECTS)
+	@echo $(SOURCES)
+	$(CC) -o $@ $^ 
+
+
+$(OBJDIR)/%.o: %.c | $(OBJDIR) $(DEPDIR)
+	$(CC) $(DEPFLAGS) $(CFLAGS) -c -o $@ $<
+
+$(OBJDIR) $(DEPDIR):
+	mkdir -p $@
+
+.PHONY:	clean
+
+clean : 
+	rm -fr $(TARGET) $(OBJECTS) $(DEPS)
+
+include $(wildcard $(DEPS))
+
+$(DEPS):
+
