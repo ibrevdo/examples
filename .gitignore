@@ -2,4 +2,4 @@
 *.d
 .dep/
 obj/
-
+*.exe
